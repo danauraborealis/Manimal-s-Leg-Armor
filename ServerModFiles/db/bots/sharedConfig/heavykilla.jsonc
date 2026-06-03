@@ -1,0 +1,37 @@
+{
+    // heavyKilla mirrors vanilla bosskilla's preset/durability/equipment
+    // tuning (same boss-tier behaviour). swap any numbers here without
+    // touching the bot's appearance/equipment list (that lives in
+    // sharedTypes/heavykilla.json).
+    "type": "heavykilla",
+    "presetBatch": 5,
+    "isBoss": true,
+    "mustHaveUniqueName": false,
+    "durability": {
+        "armor": {
+            "highestMaxPercent": 100,
+            "lowestMaxPercent": 90,
+            "maxDelta": 15,
+            "minDelta": 0,
+            "minLimitPercent": 100
+        },
+        "weapon": {
+            "highestMax": 100,
+            "lowestMax": 85,
+            "maxDelta": 10,
+            "minDelta": 0,
+            "minLimitPercent": 15
+        }
+    },
+    "equipment": {
+        "faceShieldIsActiveChancePercent": 100,
+        "forceOnlyArmoredRigWhenNoArmor": true,
+        "forceStock": true,
+        "laserIsActiveChancePercent": 85,
+        "lightIsActiveDayChancePercent": 75,
+        "lightIsActiveNightChancePercent": 85,
+        "nvgIsActiveChanceDayPercent": 0,
+        "nvgIsActiveChanceNightPercent": 0,
+        "randomisation": []
+    }
+}

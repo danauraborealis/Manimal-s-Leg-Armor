@@ -1,0 +1,46 @@
+{
+  "manifest": [
+    {
+      "key": "manimal/legarmor_fullcombo.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    },
+	{
+      "key": "manimal/legarmor_thighsonly.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    },
+	{
+      "key": "manimal/legarmor_fullcombo_blk.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    },
+	{
+      "key": "manimal/legarmor_thighsonly_blk.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    },
+	{
+      "key": "manimal/legarmor_fullcombo_killa.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    },
+	{
+      "key": "manimal/fort_s_killa_edition.bundle",
+      "dependencyKeys": [
+        "shaders",
+        "cubemaps"
+      ]
+    }
+  ]
+}

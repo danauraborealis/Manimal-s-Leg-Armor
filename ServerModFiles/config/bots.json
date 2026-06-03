@@ -1,0 +1,154 @@
+{
+    // Leg armor spawn config. To add a new variant: (1) create its JSON in
+    // db/CustomItems/, (2) add an entry under 'variants' below with its
+    // carrier tpl + plate slots, (3) add the same name as a key in each
+    // bot type's 'variants' weights. Reload the server to apply.
+
+    // Catalog of every leg armor variant the mod knows about. Name (key)
+    // is what you reference in the bot weight tables. carrierTpl = item
+    // id of the carrier armor. plates[] mirrors the carrier JSON's
+    // Slots[] - one entry per soft insert.
+    "variants": {
+        "L2_Thighs": {
+            "carrierTpl": "5e9c4f1d8a2b4c3d7f0e2a01",
+            "plates": [
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b01", "slot": "Soft_armor_left_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b02", "slot": "Soft_armor_right_thigh" }
+            ]
+        },
+        "L3_Thighs": {
+            "carrierTpl": "5e9c4f1d8a2b4c3d7f0e2a02",
+            "plates": [
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b05", "slot": "Soft_armor_left_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b06", "slot": "Soft_armor_right_thigh" }
+            ]
+        },
+        "L2_Full": {
+            "carrierTpl": "5e9c4f1d8a2b4c3d7f0e2a03",
+            "plates": [
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b01", "slot": "Soft_armor_left_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b02", "slot": "Soft_armor_right_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b03", "slot": "Soft_armor_left_calf" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b04", "slot": "Soft_armor_right_calf" }
+            ]
+        },
+        "L3_Full": {
+            "carrierTpl": "5e9c4f1d8a2b4c3d7f0e2a04",
+            "plates": [
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b05", "slot": "Soft_armor_left_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b06", "slot": "Soft_armor_right_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b07", "slot": "Soft_armor_left_calf" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b08", "slot": "Soft_armor_right_calf" }
+            ]
+        },
+        "L4_Full_Killa": {
+            "carrierTpl": "5e9c4f1d8a2b4c3d7f0e2a0d",
+            "plates": [
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b09", "slot": "Soft_armor_left_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b0a", "slot": "Soft_armor_right_thigh" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b0b", "slot": "Soft_armor_left_calf" },
+                { "tpl": "5e9c4f1d8a2b4c3d7f0e2b0c", "slot": "Soft_armor_right_calf" }
+            ]
+        }
+    },
+
+    // spawnChance: 0-100 percent the bot rolls leg armor at all (the empty
+    // holder is always injected). variants: relative weights per variant -
+    // 0 means never pick. variant keys must match entries in the 'variants'
+    // catalog above. overrides: per-role config keyed by exact SPT role
+    // name (case-insensitive). when a bot's role matches an override key
+    // it uses that block instead of the bucket. delete an override entry
+    // to fall back to the bucket.
+
+    "scav": {
+        "spawnChance": 10,
+        "variants": {
+            "L2_Thighs": 4,
+            "L2_Full": 1,
+            "L3_Thighs": 0,
+            "L3_Full": 0
+        }
+    },
+    "pmc": {
+        "spawnChance": 20,
+        "variants": {
+            "L2_Thighs": 3,
+            "L2_Full": 2,
+            "L3_Thighs": 2,
+            "L3_Full": 1
+        }
+    },
+    "raider": {
+        "spawnChance": 20,
+        "variants": {
+            "L2_Thighs": 0,
+            "L2_Full": 1,
+            "L3_Thighs": 1,
+            "L3_Full": 4
+        }
+    },
+    "boss": {
+        "spawnChance": 20,
+        "variants": {
+            "L2_Thighs": 4,
+            "L2_Full": 4,
+            "L3_Thighs": 2,
+            "L3_Full": 2
+        }
+    },
+
+    "overrides": {
+        "bossKilla": {
+            "spawnChance": 30,
+            "variants": { "L2_Thighs": 0, "L2_Full": 0, "L3_Thighs": 0, "L3_Full": 1, "L4_Full_Killa": 1 }
+        },
+        "heavyKilla": {
+            "spawnChance": 100,
+            "variants": { "L2_Thighs": 0, "L2_Full": 0, "L3_Thighs": 0, "L3_Full": 0, "L4_Full_Killa": 1 }
+        },
+        "bossTagilla": {
+            "spawnChance": 20,
+            "variants": { "L2_Thighs": 1, "L2_Full": 0, "L3_Thighs": 1, "L3_Full": 0 }
+        },
+        "bossBully": {
+            "spawnChance": 30,
+            "variants": { "L2_Thighs": 1, "L2_Full": 1, "L3_Thighs": 0, "L3_Full": 0 }
+        },
+        "bossSanitar": {
+            "spawnChance": 20,
+            "variants": { "L2_Thighs": 2, "L2_Full": 1, "L3_Thighs": 0, "L3_Full": 0 }
+        },
+        "bossGluhar": {
+            "spawnChance": 60,
+            "variants": { "L2_Thighs": 0, "L2_Full": 1, "L3_Thighs": 1, "L3_Full": 1 }
+        },
+        "bossKojaniy": {
+            "spawnChance": 20,
+            "variants": { "L2_Thighs": 2, "L2_Full": 0, "L3_Thighs": 0, "L3_Full": 0 }
+        },
+        "bossKnight": {
+            "spawnChance": 90,
+            "variants": { "L2_Thighs": 0, "L2_Full": 0, "L3_Thighs": 1, "L3_Full": 4 }
+        },
+        "followerBigPipe": {
+            "spawnChance": 90,
+            "variants": { "L2_Thighs": 0, "L2_Full": 0, "L3_Thighs": 1, "L3_Full": 4 }
+        },
+        "followerBirdEye": {
+            "spawnChance": 90,
+            "variants": { "L2_Thighs": 2, "L2_Full": 0, "L3_Thighs": 4, "L3_Full": 0 }
+        },
+        "bossKolontay": {
+            "spawnChance": 60,
+            "variants": { "L2_Thighs": 1, "L2_Full": 3, "L3_Thighs": 1, "L3_Full": 1 }
+        },
+        "bossZryachiy": {
+            "spawnChance": 10,
+            "variants": { "L2_Thighs": 4, "L2_Full": 1, "L3_Thighs": 1, "L3_Full": 0 }
+        },
+        "bossPartisan": {
+            "spawnChance": 60,
+            "variants": { "L2_Thighs": 2, "L2_Full": 2, "L3_Thighs": 0, "L3_Full": 0 }
+        }
+    }
+}

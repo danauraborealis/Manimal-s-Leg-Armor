@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>LegArmorPrepatch</AssemblyName>
+    <RootNamespace>Manimal.LegArmor.Prepatch</RootNamespace>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>D:\SPTDev\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>D:\SPTDev\BepInEx\core\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MoreBotsPrepatch">
+      <HintPath>D:\SPTDev\BepInEx\patchers\MoreBotsPrepatch.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- deploys the prepatch dll into BepInEx/patchers/LegArmorPrepatch/.
+       this folder is scanned by BepInEx's preloader at game start. -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <MakeDir Directories="D:\SPTDev\BepInEx\patchers\LegArmorPrepatch" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\SPTDev\BepInEx\patchers\LegArmorPrepatch" />
+  </Target>
+
+</Project>

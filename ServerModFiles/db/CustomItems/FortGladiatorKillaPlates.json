@@ -1,0 +1,515 @@
+{
+    "5e9c4f1d8a2b4c3d7f0e3b01": {
+        "itemTplToClone": "65703d866584602f7d057a8a",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 2,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 25,
+            "MaxDurability": 25,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "LeftForearm"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Forearm Insert (Left)",
+                "shortName": "Ceramic L Forearm",
+                "description": "A heavy ceramic-composite insert protecting the left forearm."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b02": {
+        "itemTplToClone": "65703d866584602f7d057a8a",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 2,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 25,
+            "MaxDurability": 25,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "RightForearm"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Forearm Insert (Right)",
+                "shortName": "Ceramic R Forearm",
+                "description": "A heavy ceramic-composite insert protecting the right forearm."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b03": {
+        "itemTplToClone": "6575d561b15fef3dd4051670",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 70,
+            "MaxDurability": 70,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "RibcageUp",
+                "RibcageLow"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Front Insert",
+                "shortName": "Cer Front",
+                "description": "A heavy ceramic-composite insert protecting the torso (ribcage)."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b04": {
+        "itemTplToClone": "6575d56b16c2762fba005818",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 70,
+            "MaxDurability": 70,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "SpineTop",
+                "SpineDown"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Back Insert",
+                "shortName": "Cer Back",
+                "description": "A heavy ceramic-composite insert protecting the torso (spine)."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b05": {
+        "itemTplToClone": "6575d57a16c2762fba00581c",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 30,
+            "MaxDurability": 30,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "LeftSideChestDown"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Left Side Insert",
+                "shortName": "Cer LSide",
+                "description": "A heavy ceramic-composite insert protecting the left side of the chest."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b06": {
+        "itemTplToClone": "6575d589b15fef3dd4051674",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 30,
+            "MaxDurability": 30,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "RightSideChestDown"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Right Side Insert",
+                "shortName": "Cer RSide",
+                "description": "A heavy ceramic-composite insert protecting the right side of the chest."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b07": {
+        "itemTplToClone": "6575d598b15fef3dd4051678",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 28,
+            "MaxDurability": 28,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "NeckFront",
+                "NeckBack"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Collar Insert",
+                "shortName": "Cer Collar",
+                "description": "A heavy ceramic-composite insert protecting the neck."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b08": {
+        "itemTplToClone": "6575d5b316c2762fba005824",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 24,
+            "MaxDurability": 24,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "LeftUpperArm"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic L Shoulder Insert",
+                "shortName": "Cer LShldr",
+                "description": "A heavy ceramic-composite insert protecting the left shoulder / upper arm."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b09": {
+        "itemTplToClone": "6575d5bd16c2762fba005828",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 24,
+            "MaxDurability": 24,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "RightUpperArm"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic R Shoulder Insert",
+                "shortName": "Cer RShldr",
+                "description": "A heavy ceramic-composite insert protecting the right shoulder / upper arm."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    },
+    "5e9c4f1d8a2b4c3d7f0e3b0a": {
+        "itemTplToClone": "6575d5a616c2762fba005820",
+        "parentId": "65649eb40bf0ed77b8044453",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": false,
+            "CanRequireOnRagfair": false,
+            "Weight": 0,
+            "Width": 1,
+            "Height": 1,
+            "BackgroundColor": "default",
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 34,
+            "MaxDurability": 34,
+            "armorClass": "4",
+            "BluntThroughput": 0.22,
+            "armorColliders": [
+                "Pelvis"
+            ],
+            "armorPlateColliders": [],
+            "speedPenaltyPercent": 0,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "DiscardLimit": 0,
+            "Slots": []
+        },
+        "locales": {
+            "en": {
+                "name": "Ceramic Groin Insert",
+                "shortName": "Cer Groin",
+                "description": "A heavy ceramic-composite insert protecting the pelvis."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 0,
+        "handbookPriceRoubles": 0,
+        "addtoBots": false,
+        "addtoItemBlacklist": true,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    }
+}

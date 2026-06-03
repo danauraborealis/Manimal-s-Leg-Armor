@@ -1,0 +1,103 @@
+{
+    "5e9c4f1d8a2b4c3d7f0e2a01": {
+        "itemTplToClone": "5648a7494bdc2d9d488b4583",
+        "parentId": "5e9c4f1d8a2b4c3d7f0e1c00",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": true,
+            "QuestItem": false,
+            "CanSellOnRagfair": true,
+            "Prefab": {
+                "path": "manimal/legarmor_thighsonly.bundle",
+                "rcid": ""
+            },
+            "Weight": 0.8,
+            "Width": 3,
+            "Height": 2,
+            "BackgroundColor": "default",
+            "BluntThroughput": 0,
+            "speedPenaltyPercent": -1,
+            "mousePenalty": 0,
+            "weaponErgonomicPenalty": 0,
+            "ArmorMaterial": "Aramid",
+            "ArmorType": "Light",
+            "Durability": 0,
+            "MaxDurability": 0,
+            "armorClass": 0,
+            "armorZone": [],
+            "armorColliders": [],
+            "armorPlateColliders": [],
+            "Slots": [
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2c01",
+                    "_name": "Soft_armor_left_thigh",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a01",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b01"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b01",
+                                "armorColliders": [
+                                    "LeftThigh"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                },
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2c02",
+                    "_name": "Soft_armor_right_thigh",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a01",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b02"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b02",
+                                "armorColliders": [
+                                    "RightThigh"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                }
+            ]
+        },
+        "locales": {
+            "en": {
+                "name": "Class 2 Thigh Armor",
+                "shortName": "L2 Thighs",
+                "description": "Class 2 soft leg armor covering both thighs. Soft inserts are locked in place."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 15000,
+        "handbookPriceRoubles": 15000,
+        "addtoBots": false,
+        "addtoItemBlacklist": false,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    }
+}

@@ -1,0 +1,151 @@
+{
+    "5e9c4f1d8a2b4c3d7f0e2a0d": {
+        "itemTplToClone": "5648a7494bdc2d9d488b4583",
+        "parentId": "5e9c4f1d8a2b4c3d7f0e1c00",
+        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "overrideProperties": {
+            "ExaminedByDefault": false,
+            "QuestItem": false,
+            "CanSellOnRagfair": true,
+            "Prefab": {
+                "path": "manimal/legarmor_fullcombo_killa.bundle",
+                "rcid": ""
+            },
+            "Weight": 2.4,
+            "Width": 3,
+            "Height": 4,
+            "BackgroundColor": "default",
+            "BluntThroughput": 0,
+            "speedPenaltyPercent": -5,
+            "mousePenalty": -2,
+            "weaponErgonomicPenalty": -2,
+            "ArmorMaterial": "Ceramic",
+            "ArmorType": "Light",
+            "Durability": 0,
+            "MaxDurability": 0,
+            "armorClass": 0,
+            "armorZone": [],
+            "armorColliders": [],
+            "armorPlateColliders": [],
+            "Slots": [
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2d01",
+                    "_name": "Soft_armor_left_thigh",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a0d",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b09"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b09",
+                                "armorColliders": [
+                                    "LeftThigh"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                },
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2d02",
+                    "_name": "Soft_armor_right_thigh",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a0d",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b0a"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b0a",
+                                "armorColliders": [
+                                    "RightThigh"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                },
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2d03",
+                    "_name": "Soft_armor_left_calf",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a0d",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b0b"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b0b",
+                                "armorColliders": [
+                                    "LeftCalf"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                },
+                {
+                    "_id": "5e9c4f1d8a2b4c3d7f0e2d04",
+                    "_name": "Soft_armor_right_calf",
+                    "_parent": "5e9c4f1d8a2b4c3d7f0e2a0d",
+                    "_props": {
+                        "filters": [
+                            {
+                                "Filter": [
+                                    "5e9c4f1d8a2b4c3d7f0e2b0c"
+                                ],
+                                "Plate": "5e9c4f1d8a2b4c3d7f0e2b0c",
+                                "armorColliders": [
+                                    "RightCalf"
+                                ],
+                                "armorPlateColliders": [],
+                                "bluntDamageReduceFromSoftArmor": false,
+                                "locked": true
+                            }
+                        ]
+                    },
+                    "_required": false,
+                    "_mergeSlotWithChildren": true,
+                    "_proto": "64479fdf9731c8fadc0642c1"
+                }
+            ]
+        },
+        "locales": {
+            "en": {
+                "name": "Killa's Leg Armor",
+                "shortName": "Killa Legs",
+                "description": "Killa's personal ceramic-composite leg armor. Class 4 coverage on both thighs and calves. Inserts are locked in place."
+            }
+        },
+        "addtoInventorySlots": [],
+        "addtoModSlots": false,
+        "modSlot": [],
+        "fleaPriceRoubles": 60000,
+        "handbookPriceRoubles": 60000,
+        "addtoBots": false,
+        "addtoItemBlacklist": false,
+        "addtoStaticLootContainers": false,
+        "staticLootContainers": [],
+        "addLooseLoot": false,
+        "addLooseLootProbability": 0,
+        "addtoHallOfFame": false,
+        "hallOfFameSlots": [],
+        "addtoTraders": false
+    }
+}
