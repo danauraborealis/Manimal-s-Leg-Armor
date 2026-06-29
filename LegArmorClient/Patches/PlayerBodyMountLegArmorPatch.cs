@@ -38,6 +38,11 @@ namespace Manimal.LegArmor.Patches
         // doesnt collect them. stale entries get disposed at next Init.
         private static readonly Dictionary<PlayerBody, PlayerBody.EquipmentSlotClass> _liveSlots = new();
 
+        // per-body slot-change handler so we can unsubscribe on re-Init.
+        // without it the slot accumulates a handler per Init and every
+        // transition fires N times.
+        private static readonly Dictionary<PlayerBody, System.Action<Item>> _slotChangeHandlers = new();
+
         // EquipmentSlotClass.Dispose() also calls DestroyCurrentModel, which
         // returns the GameObject to the pool - we cant call it to release
         // the binding without losing the visual. reflect Action_0/_2 and
@@ -101,6 +106,11 @@ namespace Manimal.LegArmor.Patches
                 }
                 _liveSlots.Remove(b);
             }
+            // mirror cleanup for the handler dict so dead bodies dont
+            // pile up there either. handler refs become GC-eligible once
+            // the slot itself goes away.
+            var staleHandlers = _slotChangeHandlers.Keys.Where(b => b == null).ToList();
+            foreach (var b in staleHandlers) _slotChangeHandlers.Remove(b);
 
             var pocketsItem = equipment.GetSlot(EquipmentSlot.Pockets)?.ContainedItem as CompoundItem;
             if (pocketsItem == null) return;
@@ -131,34 +141,54 @@ namespace Manimal.LegArmor.Patches
                 try { prev.Dispose(); } catch { /* best effort */ }
                 _liveSlots.Remove(body);
             }
-
-            if (slot.ContainedItem != null)
+            // unsubscribe any prior handler on this body so re-Init doesnt
+            // double-fire on subsequent slot changes.
+            if (_slotChangeHandlers.TryGetValue(body, out var oldHandler))
             {
-                MountNow(body, slot, bone);
-                return;
+                try { slot.OnAddOrRemoveItem -= oldHandler; } catch { /* best effort */ }
+                _slotChangeHandlers.Remove(body);
             }
 
-            // empty slot at init - common on Time Has Come where the body
-            // is built before equipment resolves. subscribe to the plain
-            // C# OnAddOrRemoveItem event (not the reactive bindable that
-            // caused the inventory fade) and mount when the item arrives.
-            // handler unsubscribes if the body dies first.
+            // single persistent handler covers every transition:
+            //   empty -> filled  : mount (handles deferred-fill case)
+            //   filled -> empty  : dispose so the visual disappears when
+            //                      the armor is looted off a corpse
+            //   filled -> filled : skipped via _liveSlots guard
+            // binding was released at mount, so Dispose only fires
+            // method_3/method_2/DestroyCurrentModel - no transaction
+            // reentrancy from Action_0/Action_2.
+            //
+            // Slot fires OnAddOrRemoveItem with the AFFECTED item on both
+            // add and remove (Slot.cs RemoveItemInternal passes
+            // containedItem AFTER nulling ContainedItem), so the handler
+            // param doesnt tell us the new state - read slot.ContainedItem.
             System.Action<Item> handler = null;
-            handler = (Item item) =>
+            handler = (Item _) =>
             {
                 if (body == null)
                 {
                     slot.OnAddOrRemoveItem -= handler;
+                    _slotChangeHandlers.Remove(body);
                     return;
                 }
-                if (item == null) return;
-                slot.OnAddOrRemoveItem -= handler;
+                if (slot.ContainedItem == null)
+                {
+                    if (_liveSlots.TryGetValue(body, out var sc))
+                    {
+                        try { sc.Dispose(); } catch { /* best effort */ }
+                        _liveSlots.Remove(body);
+                    }
+                    return;
+                }
                 if (_liveSlots.ContainsKey(body)) return;
                 try { MountNow(body, slot, bone); }
-                catch (System.Exception ex) { Plugin.LogSource?.LogError($"[LegArmor] deferred mount failed: {ex}"); }
+                catch (System.Exception ex) { Plugin.LogSource?.LogError($"[LegArmor] add-handler mount failed: {ex}"); }
             };
             slot.OnAddOrRemoveItem += handler;
-            Plugin.LogSource?.LogInfo("[LegArmor] holder slot empty at init; subscribed for later mount");
+            _slotChangeHandlers[body] = handler;
+
+            if (slot.ContainedItem != null)
+                MountNow(body, slot, bone);
         }
 
         private static void MountNow(PlayerBody body, Slot slot, Transform bone)

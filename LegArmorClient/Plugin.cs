@@ -1,6 +1,4 @@
-using System.Linq;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using Manimal.LegArmor.Patches;
 
@@ -28,18 +26,10 @@ namespace Manimal.LegArmor
             LogSource = Logger;
             Instance = this;
 
-            // pick hardcoded layout values based on whether Trenchfoot-BeltSlot
-            // is also loaded - the belt row shifts the containers panel so
-            // we apply a different set of offsets to compensate. no BepInEx
-            // bindings anymore (used to be F12-tunable; values are locked in).
-            var beltSlotInstalled = Chainloader.PluginInfos.ContainsKey("com.trenchfoot.beltslot");
-            LegArmorConfig.Init(beltSlotInstalled);
-            if (beltSlotInstalled)
-                LogSource.LogInfo("[LegArmor] Trenchfoot-BeltSlot detected; using belt-aware layout values");
-
             // each patch is its own ModulePatch so one broken one wont block the rest.
             new InventoryArmorAggregatePatch().Enable();
             new EquipmentTabShowPatch().Enable();
+            new LegArmorContainersPanelPatch().Enable();
             new HideHolderGridPatch().Enable();
             new EquipItemWindowSlotIdPatch().Enable();
             new ArmorVestRejectLegArmorPatch().Enable();

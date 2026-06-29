@@ -7,17 +7,22 @@ using EFT.UI.DragAndDrop;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Manimal.LegArmor.Patches
 {
-    // postfix EquipmentTab.Show: resolve the holder slot in the player's
-    // pockets, clone the armband SlotView for styling, reposition into
-    // the layout, and call Show on the clone. vanilla then drives drag/
-    // drop, tooltips, durability bar.
+    // postfix EquipmentTab.Show for the player's OWN equipment view only:
+    // resolve the holder slot in pockets, clone the armband SlotView,
+    // reposition into the layout, and call Show on the clone. vanilla
+    // then drives drag/drop, tooltips, durability bar.
     //
     // we also reposition the holster + scabbard + weapon slots so the leg
     // armor doesnt overlap them - tunable constants below.
+    //
+    // corpse / other-inventory views are NOT handled here. they go through
+    // LegArmorContainersPanelPatch which drops the slot into the
+    // ContainersPanel's VLG (Unity auto-layout). EquipmentTab is hand-
+    // positioned and the corpse view's outer scrollview was constantly
+    // resetting our manual offsets - the VLG path is much more stable.
     public class EquipmentTabShowPatch : ModulePatch
     {
         // matches LegArmorHolderService.HolderTpl. used to find a holder
@@ -107,6 +112,10 @@ namespace Manimal.LegArmor.Patches
             if (isOwnView)
                 LegArmorState.Bind(holder.Id.ToString(), holder, slot);
 
+            // corpse / other-inventory views go through
+            // LegArmorContainersPanelPatch instead.
+            if (!isOwnView) return;
+
             var visualTemplate = VisualTemplateField.GetValue(tab) as SlotView;
             var anchorTemplate = AnchorTemplateField.GetValue(tab) as SlotView;
             if (visualTemplate == null || anchorTemplate == null)
@@ -115,12 +124,7 @@ namespace Manimal.LegArmor.Patches
                 return;
             }
 
-            // shift surrounding slots and get the leg armor's target Y.
-            // corpse-loot / other-inventory views use a tighter layout where
-            // per-field deltas miss tactical rig + pockets; uniform shift fixes it.
-            var legArmorY = isOwnView
-                ? RelayoutOnce(tab, anchorTemplate)
-                : RelayoutCorpseView(tab, anchorTemplate);
+            var legArmorY = RelayoutOnce(tab, anchorTemplate);
 
             EnsureClonedSlotView(tab.transform, visualTemplate, anchorTemplate, legArmorY, slot, equipmentContext, inventoryController, skills, insurance, inRaid);
         }
@@ -148,39 +152,6 @@ namespace Manimal.LegArmor.Patches
         private const float LegArmorYOffset = 10f;
         private const float PrimaryWeaponYDelta = -68f;
         private const float SecondaryWeaponYDelta = -68f;
-
-        // corpse-loot view config lookups, keyed by the slot's GameObject
-        // name under "Containers Scrollview/Content". weapon row slots
-        // return a Y offset (negative = down); container slots return a
-        // spacer height (positive = pushes slot down).
-        private static readonly System.Collections.Generic.Dictionary<string, System.Func<float>> _corpseWeaponOffsets =
-            new()
-            {
-                // primary row: weapon + holster share an offset.
-                ["FirstPrimaryWeapon Slot"]  = () => Manimal.LegArmor.LegArmorConfig.PrimaryRowOffsetY,
-                ["Holster Slot"]             = () => Manimal.LegArmor.LegArmorConfig.PrimaryRowOffsetY,
-                ["SecondPrimaryWeapon Slot"] = () => Manimal.LegArmor.LegArmorConfig.SecondaryRowOffsetY,
-                ["Scabbard Slot"]            = () => Manimal.LegArmor.LegArmorConfig.SecondaryRowOffsetY,
-            };
-
-        private static readonly System.Collections.Generic.Dictionary<string, System.Func<float>> _corpseContainerSpacerHeights =
-            new()
-            {
-                ["TacticalVest Slot"] = () => Manimal.LegArmor.LegArmorConfig.TacticalRigSpacerHeight,
-                ["Backpack Slot"]     = () => Manimal.LegArmor.LegArmorConfig.BackpackSpacerHeight,
-                ["Pockets Slot"]      = () => Manimal.LegArmor.LegArmorConfig.PocketsSpacerHeight,
-            };
-
-        // per-slot fine-tune offsets applied by a watchdog (CorpseSlotOffsetter)
-        // attached to each VLG slot. allows negative values so the user can
-        // pull slots up tighter than vanilla VLG placement.
-        private static readonly System.Collections.Generic.Dictionary<string, System.Func<float>> _corpseContainerSlotOffsets =
-            new()
-            {
-                ["TacticalVest Slot"] = () => Manimal.LegArmor.LegArmorConfig.TacticalRigSlotOffsetY,
-                ["Backpack Slot"]     = () => Manimal.LegArmor.LegArmorConfig.BackpackSlotOffsetY,
-                ["Pockets Slot"]      = () => Manimal.LegArmor.LegArmorConfig.PocketsSlotOffsetY,
-            };
 
         // runs for every EquipmentTab instance. capturing each slot's original Y
         // on first sight (per RectTransform InstanceID) lets re-Shows on the same
@@ -217,133 +188,6 @@ namespace Manimal.LegArmor.Patches
             return legArmorY;
         }
 
-        // corpse-loot view relayout. the slots we care about all live under
-        // "Containers Scrollview/Content"; walk it and apply per-name
-        // offsets from the BepInEx config. body armor + leg armor + other
-        // upper-body slots are NOT touched - they stay where vanilla puts
-        // them.
-        private static float RelayoutCorpseView(EquipmentTab tab, SlotView bodyArmorSlot)
-        {
-            var holsterRt = GetRectTransform(tab, HolsterSlotField);
-            if (holsterRt == null)
-            {
-                Plugin.LogSource?.LogError("[LegArmor] corpse relayout: holster RT missing");
-                return 0f;
-            }
-
-            // legArmorY is still derived from the (un-shifted) holster Y so
-            // our cloned slot view sits in the correct row.
-            var legArmorY = OriginalY(holsterRt) + LegArmorYOffset;
-
-            var scrollview = FindContainersScrollview(tab.transform);
-            if (scrollview == null)
-            {
-                Plugin.LogSource?.LogWarning("[LegArmor] corpse relayout: Containers Scrollview not found within 6 ancestor levels");
-                return legArmorY;
-            }
-
-            foreach (var rt in scrollview.GetComponentsInChildren<RectTransform>(true))
-            {
-                if (rt == null) continue;
-                var name = rt.gameObject.name;
-
-                if (_corpseContainerSpacerHeights.TryGetValue(name, out var spacerFn))
-                {
-                    // VLG-managed slot: inject a spacer GameObject before it.
-                    // positive config value = taller spacer = slot pushed down.
-                    EnsureSpacerBefore(rt, Mathf.Max(0f, spacerFn()));
-                    var le = rt.GetComponent<LayoutElement>();
-                    if (le != null && le.ignoreLayout) le.ignoreLayout = false;
-
-                    // attach the per-slot fine-tune watchdog (CorpseSlotOffsetter).
-                    // VLG places the slot at its natural Y each frame; the
-                    // watchdog re-applies the configured delta on top so
-                    // small +/- adjustments work without breaking reflow.
-                    if (_corpseContainerSlotOffsets.TryGetValue(name, out var slotOffsetFn))
-                    {
-                        var offsetter = rt.GetComponent<CorpseSlotOffsetter>();
-                        if (offsetter == null) offsetter = rt.gameObject.AddComponent<CorpseSlotOffsetter>();
-                        offsetter.OffsetFn = slotOffsetFn;
-                    }
-                }
-                else if (_corpseWeaponOffsets.TryGetValue(name, out var offsetFn))
-                {
-                    // weapon-row slot inside Gear Panel Template (no VLG):
-                    // direct anchoredPosition manipulation. negative Y = down.
-                    int id = rt.GetInstanceID();
-                    if (!_corpseSlotBaseline.TryGetValue(id, out var baseline))
-                    {
-                        baseline = rt.anchoredPosition;
-                        _corpseSlotBaseline[id] = baseline;
-                    }
-                    var le = rt.GetComponent<LayoutElement>();
-                    if (le == null) le = rt.gameObject.AddComponent<LayoutElement>();
-                    if (!le.ignoreLayout) le.ignoreLayout = true;
-                    rt.anchoredPosition = new Vector2(baseline.x, baseline.y + offsetFn());
-                }
-            }
-
-            return legArmorY;
-        }
-
-        // baseline cache for non-VLG slots only (weapon rows). VLG-managed
-        // slots don't need it - their spacer drives the offset.
-        private static readonly System.Collections.Generic.Dictionary<int, Vector2> _corpseSlotBaseline = new();
-
-        // creates (or reuses) a named GameObject before slotRt in its parent's
-        // sibling order with a LayoutElement at the given preferred height.
-        // height = 0 effectively zeroes the offset.
-        private static void EnsureSpacerBefore(RectTransform slotRt, float height)
-        {
-            var parent = slotRt.parent;
-            if (parent == null) return;
-
-            var spacerName = "LegArmorSpacer_" + slotRt.gameObject.name;
-            Transform spacer = null;
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                var c = parent.GetChild(i);
-                if (c.name == spacerName) { spacer = c; break; }
-            }
-
-            if (spacer == null)
-            {
-                var go = new GameObject(spacerName, typeof(RectTransform), typeof(LayoutElement));
-                go.transform.SetParent(parent, false);
-                spacer = go.transform;
-            }
-
-            // park the spacer at the end first so SetSiblingIndex always
-            // moves from later -> earlier. that way SetSiblingIndex(slotIdx)
-            // shifts the slot forward by one and the spacer correctly lands
-            // right before the slot. without this, if the spacer was already
-            // immediately before the slot, SetSiblingIndex(slotIdx) would
-            // swap them (Unity moves spacer to slotIdx and pushes slot to
-            // slotIdx-1, putting spacer AFTER the slot).
-            spacer.SetAsLastSibling();
-            spacer.SetSiblingIndex(slotRt.GetSiblingIndex());
-
-            var le = spacer.GetComponent<LayoutElement>();
-            le.minHeight = height;
-            le.preferredHeight = height;
-            le.flexibleHeight = 0;
-        }
-
-        private static Transform FindContainersScrollview(Transform start)
-        {
-            // climb up to 6 levels; thats enough to reach the Complex Loot
-            // Panel ancestor of both EquipmentTab and the scrollview.
-            var cur = start;
-            for (int i = 0; i < 6 && cur != null; i++)
-            {
-                foreach (var rt in cur.GetComponentsInChildren<RectTransform>(true))
-                {
-                    if (rt.name == "Containers Scrollview") return rt;
-                }
-                cur = cur.parent;
-            }
-            return null;
-        }
 
         // cache the first-seen Y per RectTransform so subsequent shifts use
         // the pre-shift baseline.
@@ -388,7 +232,14 @@ namespace Manimal.LegArmor.Patches
             InsuranceCompanyClass insurance,
             bool inRaid)
         {
-            var existing = tabTransform.Find(ClonedSlotName);
+            // reuse must look in the SAME parent we instantiate into - the
+            // body armor slot's parent, NOT the tab root. Transform.Find only
+            // checks direct children, and the clone isnt a direct child of the
+            // tab, so searching tabTransform never found it -> a fresh SlotView
+            // got created every Show and they stacked (intensifying drop
+            // shadow, old icon ghosting underneath the new empty clones).
+            var slotParent = anchorTemplate.transform.parent;
+            var existing = slotParent.Find(ClonedSlotName);
             SlotView legSlotView;
             if (existing != null)
             {
@@ -398,7 +249,7 @@ namespace Manimal.LegArmor.Patches
             {
                 // armband visual parented under body armor's parent for the
                 // same layout column. Y comes from the relayout pass.
-                var clone = Object.Instantiate(visualTemplate.gameObject, anchorTemplate.transform.parent);
+                var clone = Object.Instantiate(visualTemplate.gameObject, slotParent);
                 clone.name = ClonedSlotName;
                 legSlotView = clone.GetComponent<SlotView>();
 
@@ -426,6 +277,35 @@ namespace Manimal.LegArmor.Patches
             // EquipItemWindowSlotIdPatch substitutes "ArmorVest" to keep
             // the parse happy.
             legSlotView.Show(slot, equipmentContext, inventoryController, ItemUiContext.Instance, skills, insurance, !inRaid);
+
+            // SlotView.Show renames the GameObject to "<slotId> Slot"
+            // ("mod_legarmor Slot"), wiping the ClonedSlotName tag we set on
+            // create. that defeated reuse-by-name -> a fresh clone every open
+            // -> stacking (intensifying drop shadow). restore our tag so the
+            // next Show's Find reuses this same clone.
+            legSlotView.gameObject.name = ClonedSlotName;
+
+            // the cloned armband slot's empty placeholder is the ArmBand
+            // silhouette (the faded "ghost" the user saw - it's a background
+            // Image, not an ItemView, so ClearSlotPlace never touched it).
+            // disabling the Image hides it for good: vanilla SetSlotGraphics
+            // only toggles the GameObject active, so a disabled Image stays
+            // hidden across fill/empty cycles.
+            foreach (var img in legSlotView.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+            {
+                if (img != null && img.sprite != null && img.sprite.name == "ArmBand")
+                    img.enabled = false;
+            }
+
+            // vanilla SlotView.Show on an EMPTY slot only swaps the empty
+            // graphics - it never kills a leftover ItemView. with the clone
+            // now correctly reused, a previously-shown armor icon would
+            // otherwise linger once the slot empties. safe to clear here: this
+            // runs on inventory-open, not inside a drag or an inventory
+            // transaction (clearing from a slot event was what broke
+            // OnBeginDrag earlier).
+            if (slot.ContainedItem == null)
+                ClearSlotPlace(legSlotView);
         }
 
         private static void ClearSlotPlace(SlotView view)
