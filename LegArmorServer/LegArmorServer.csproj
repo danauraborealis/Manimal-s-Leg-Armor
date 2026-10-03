@@ -1,110 +1,68 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>LegArmorMod</RootNamespace>
     <AssemblyName>LegArmorServer</AssemblyName>
     <Company>$(ModAuthor)</Company>
     <Product>$(ModServerName)</Product>
+    <Version>$(ModVersion)</Version>
     <Description>Server-side mod for LegArmor</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!-- Authors / Version / AssemblyVersion / FileVersion inherited from ../Directory.Build.props -->
+    <SptPackageServerDirectory Condition="'$(SptPackageServerDirectory)' == ''">SPT_Runtime</SptPackageServerDirectory>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.3.6" />
-    <PackageReference Include="SPTarkov.Common" Version="4.0.13" />
-    <PackageReference Include="SPTarkov.DI" Version="4.0.13" />
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.13" />
-    <PackageReference Include="WTT-ServerCommonLib" Version="2.0.20" />
+    <Reference Include="0Harmony"><HintPath>$(SptServerRoot)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.Common"><HintPath>$(SptServerRoot)\SPTarkov.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.DI"><HintPath>$(SptServerRoot)\SPTarkov.DI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.Reflection"><HintPath>$(SptServerRoot)\SPTarkov.Reflection.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.Server.Core"><HintPath>$(SptServerRoot)\SPTarkov.Server.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SemanticVersioning"><HintPath>$(SptServerRoot)\SemanticVersioning.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="WTT-ServerCommonLib"><HintPath>$(SptServerRoot)\user\mods\WTT-ServerCommonLib\WTT-ServerCommonLib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MoreBotsServer"><HintPath>$(SptServerRoot)\user\mods\MoreBotsServer\MoreBotsServer.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MoreBotsServer">
-      <Private>false</Private>
-      <HintPath>D:\SPTDev\SPT\user\mods\MoreBotsServer\MoreBotsServer.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <!-- copy DLL and all static mod files to the SPT dev install -->
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="DeployServer" AfterTargets="Build" Condition="'$(DeployToLocalInstall)' == 'true'">
     <PropertyGroup>
-      <DeployDir>D:\SPTDev\SPT\user\mods\$(AssemblyName)</DeployDir>
-      <ServerModFilesDir>$(ProjectDir)..\ServerModFiles</ServerModFilesDir>
+      <DeployDir>$(SptServerRoot)\user\mods\$(AssemblyName)</DeployDir>
     </PropertyGroup>
     <MakeDir Directories="$(DeployDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DeployDir)" />
     <ItemGroup>
-      <StaticModFiles Include="$(ServerModFilesDir)\**\*" />
+      <StaticModFiles Include="$(MSBuildProjectDirectory)\..\ServerModFiles\**\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(StaticModFiles)"
-          DestinationFiles="@(StaticModFiles->'$(DeployDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(StaticModFiles)" DestinationFiles="@(StaticModFiles->'$(DeployDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
-  <Target Name="PackageModForDistribution" AfterTargets="Build">
+  <!-- Explicit packaging avoids racing solution builds and never deploys to a game install. -->
+  <Target Name="PackageCombined" DependsOnTargets="Build">
     <PropertyGroup>
-      <ModName>$(AssemblyName)</ModName>
-      <ZipFileName>$(ModName)-$(ModVersion).zip</ZipFileName>
-      <TempPackageDir>$(ProjectDir)obj\Package</TempPackageDir>
-      <ModPackageDir>$(TempPackageDir)\SPT\user\mods\$(ModName)</ModPackageDir>
-      <ServerModFilesDir>$(ProjectDir)..\ServerModFiles</ServerModFilesDir>
-    </PropertyGroup>
-    <Message Text="--- Starting Mod packaging for distribution ---" Importance="high" />
-    <RemoveDir Directories="$(TempPackageDir)" />
-    <MakeDir Directories="$(ModPackageDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModPackageDir)" />
-    <ItemGroup>
-      <StaticModFilesForZip Include="$(ServerModFilesDir)\**\*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(StaticModFilesForZip)"
-          DestinationFiles="@(StaticModFilesForZip->'$(ModPackageDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <ZipDirectory SourceDirectory="$(TempPackageDir)" DestinationFile="$(ProjectDir)$(ZipFileName)" Overwrite="true" />
-    <RemoveDir Directories="$(TempPackageDir)" />
-    <Message Text="--- Mod successfully packaged at: $(ProjectDir)$(ZipFileName) ---" Importance="high" />
-  </Target>
-
-  <!--
-    builds the client csproj (no-op if already up to date), then assembles a single zip
-    at the solution root containing both compiled dlls and ServerModFiles, laid out so
-    end users can extract on top of their SPT install root.
-  -->
-  <Target Name="PackageCombined" AfterTargets="PackageModForDistribution">
-    <PropertyGroup>
-      <SolutionDir>$(ProjectDir)..\</SolutionDir>
-      <ClientProject>$(SolutionDir)LegArmorClient\LegArmorClient.csproj</ClientProject>
-      <CombinedZipPath>$(SolutionDir)$(ModForgeName)-$(ModVersion).zip</CombinedZipPath>
-      <CombinedTempDir>$(ProjectDir)obj\CombinedPackage</CombinedTempDir>
+      <ModRoot>$(MSBuildProjectDirectory)\..</ModRoot>
+      <CombinedZipPath>$(ModRoot)\$(ModForgeName)-$(ModVersion)-SPT41$(PackageNameSuffix).zip</CombinedZipPath>
+      <CombinedTempDir>$(MSBuildProjectDirectory)\obj\CombinedPackage</CombinedTempDir>
       <CombinedClientDir>$(CombinedTempDir)\BepInEx\plugins\$(ModServerName)</CombinedClientDir>
-      <CombinedServerDir>$(CombinedTempDir)\SPT\user\mods\$(AssemblyName)</CombinedServerDir>
-      <ServerModFilesDir>$(SolutionDir)ServerModFiles</ServerModFilesDir>
+      <CombinedPrepatchDir>$(CombinedTempDir)\BepInEx\patchers\LegArmorPrepatch</CombinedPrepatchDir>
+      <CombinedServerDir>$(CombinedTempDir)\$(SptPackageServerDirectory)\user\mods\$(AssemblyName)</CombinedServerDir>
     </PropertyGroup>
-
-    <Message Text="--- Building combined client+server package ---" Importance="high" />
-
-    <!-- ensure client dll is fresh; capture its output path so we dont have to hardcode netstandard2.1 -->
-    <MSBuild Projects="$(ClientProject)"
-             Targets="Build"
-             Properties="Configuration=$(Configuration)">
+    <MSBuild Projects="$(ModRoot)\LegArmorClient\LegArmorClient.csproj" Targets="Build" Properties="Configuration=$(Configuration);DeployToLocalInstall=false">
       <Output TaskParameter="TargetOutputs" ItemName="ClientBuildOutput" />
     </MSBuild>
-
+    <MSBuild Projects="$(ModRoot)\LegArmorPrepatch\LegArmorPrepatch.csproj" Targets="Build" Properties="Configuration=$(Configuration);DeployToLocalInstall=false">
+      <Output TaskParameter="TargetOutputs" ItemName="PrepatchBuildOutput" />
+    </MSBuild>
     <RemoveDir Directories="$(CombinedTempDir)" />
-    <MakeDir Directories="$(CombinedClientDir);$(CombinedServerDir)" />
-
+    <MakeDir Directories="$(CombinedClientDir);$(CombinedPrepatchDir);$(CombinedServerDir)" />
     <Copy SourceFiles="@(ClientBuildOutput)" DestinationFolder="$(CombinedClientDir)" />
+    <Copy SourceFiles="@(PrepatchBuildOutput)" DestinationFolder="$(CombinedPrepatchDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(CombinedServerDir)" />
-
     <ItemGroup>
-      <CombinedStaticFiles Include="$(ServerModFilesDir)\**\*" />
+      <CombinedStaticFiles Include="$(ModRoot)\ServerModFiles\**\*.json;$(ModRoot)\ServerModFiles\**\*.jsonc;$(ModRoot)\ServerModFiles\**\*.bundle" />
     </ItemGroup>
-    <Copy SourceFiles="@(CombinedStaticFiles)"
-          DestinationFiles="@(CombinedStaticFiles->'$(CombinedServerDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
-
+    <Copy SourceFiles="@(CombinedStaticFiles)" DestinationFiles="@(CombinedStaticFiles->'$(CombinedServerDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <ZipDirectory SourceDirectory="$(CombinedTempDir)" DestinationFile="$(CombinedZipPath)" Overwrite="true" />
     <RemoveDir Directories="$(CombinedTempDir)" />
-
-    <Message Text="--- Combined package: $(CombinedZipPath) ---" Importance="high" />
+    <Message Text="Install package: $(CombinedZipPath)" Importance="high" />
   </Target>
 </Project>

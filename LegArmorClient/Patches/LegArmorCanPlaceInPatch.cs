@@ -11,7 +11,7 @@ namespace Manimal.LegArmor.Patches
     // placing items INTO a destination that belongs to our leg armor
     // system (e.g. putting a plate back into the carrier on a corpse).
     //
-    // gate is at InteractionsHandlerClass.smethod_24, the destination-
+    // gate is at ItemManipulator.CanTransferTo, the destination-
     // side counterpart to CanModifyItem. produces GClass1565 if the
     // search controller reports the destination container as unsearched.
     public class LegArmorCanPlaceInPatch : ModulePatch
@@ -20,7 +20,7 @@ namespace Manimal.LegArmor.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(InteractionsHandlerClass), "smethod_24");
+            return AccessTools.Method(typeof(ItemManipulator), nameof(ItemManipulator.CanTransferTo));
         }
 
         private static int _logCounter;

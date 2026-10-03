@@ -1,9 +1,8 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers;
 
 namespace LegArmorMod;
 
@@ -12,7 +11,7 @@ namespace LegArmorMod;
 // dict, so once Fence rolls our preset the server crashes. inject a limit.
 [Injectable(InjectionType.Singleton)]
 public class FencePriceLimitPatcher(
-    ConfigServer configServer,
+    TraderConfig traderConfig,
     ISptLogger<FencePriceLimitPatcher> logger)
 {
     private static readonly MongoId LegArmorParent = new("5e9c4f1d8a2b4c3d7f0e1c00");
@@ -23,7 +22,7 @@ public class FencePriceLimitPatcher(
 
     public void Apply()
     {
-        var fenceConfig = configServer.GetConfig<TraderConfig>()?.Fence;
+        var fenceConfig = traderConfig.Fence;
         if (fenceConfig?.ItemCategoryRoublePriceLimit == null)
         {
             logger.Error("[LegArmor] Fence.ItemCategoryRoublePriceLimit not available");

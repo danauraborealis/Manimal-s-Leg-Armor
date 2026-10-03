@@ -6,7 +6,10 @@ namespace Manimal.LegArmor
 {
     // ModInfo is generated from Directory.Build.props - bump the version there.
     [BepInPlugin(ModInfo.Guid, ModInfo.ForgeName, ModInfo.Version)]
-    [BepInDependency("com.wtt.commonlib")]
+    [BepInDependency("com.wtt.commonlib", "3.0.6")]
+    [BepInDependency("com.arys.unitytoolkit", "2.0.2")]
+    [BepInDependency("com.morebotsapi.tacticaltoaster", "2.1.1")]
+    [BepInDependency("com.trenchfoot.beltslot", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource LogSource;
@@ -26,10 +29,15 @@ namespace Manimal.LegArmor
             LogSource = Logger;
             Instance = this;
 
+            PackNStrapCompatibilityPatch.TryEnable();
+
             // each patch is its own ModulePatch so one broken one wont block the rest.
             new InventoryArmorAggregatePatch().Enable();
             new EquipmentTabShowPatch().Enable();
             new LegArmorContainersPanelPatch().Enable();
+            new LegArmorContainersPanelClosePatch().Enable();
+            new LegArmorComplexStashShowHealPatch().Enable();
+            new LegArmorItemsPanelShowHealPatch().Enable();
             new HideHolderGridPatch().Enable();
             new EquipItemWindowSlotIdPatch().Enable();
             new ArmorVestRejectLegArmorPatch().Enable();

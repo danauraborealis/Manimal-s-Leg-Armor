@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Utils;
 
 namespace LegArmorMod;
 

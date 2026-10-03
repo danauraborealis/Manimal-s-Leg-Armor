@@ -1,13 +1,13 @@
-using System.Linq;
 using System.Reflection;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SPT.Reflection.Patching;
+using ZLinq;
 
 namespace Manimal.LegArmor.Patches
 {
     // alt-click "quick equip" goes through FindSlotToPickUp (extension
-    // method on GClass3373). vanilla's hardcoded item-type -> slot
+    // method on InventoryExtension). vanilla's hardcoded item-type -> slot
     // cascade doesn't know about our mod_legarmor slot - leg armors
     // fall through, return null, "No free slot for that item".
     //
@@ -22,13 +22,10 @@ namespace Manimal.LegArmor.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            var t = AccessTools.TypeByName("GClass3373");
-            if (t == null)
-            {
-                Plugin.LogSource?.LogWarning("[LegArmor] GClass3373 not found; quick-equip-into-leg-armor disabled");
-                return null;
-            }
-            return AccessTools.Method(t, "FindSlotToPickUp", new[] { typeof(InventoryEquipment), typeof(Item) });
+            return AccessTools.Method(
+                typeof(InventoryExtension),
+                nameof(InventoryExtension.FindSlotToPickUp),
+                new[] { typeof(InventoryEquipment), typeof(Item) });
         }
 
         [PatchPostfix]
@@ -52,14 +49,12 @@ namespace Manimal.LegArmor.Patches
             var pockets = equipment.GetSlot(EquipmentSlot.Pockets)?.ContainedItem as CompoundItem;
             if (pockets == null) return null;
 
-            CompoundItem holder = null;
-            foreach (var child in pockets.GetAllItems())
-            {
-                if (child.StringTemplateId == HolderTpl) { holder = child as CompoundItem; break; }
-            }
+            var holder = pockets.GetAllItems()
+                .AsValueEnumerable()
+                .FirstOrDefault(child => child.StringTemplateId == HolderTpl) as CompoundItem;
             if (holder == null) return null;
 
-            return holder.Slots?.FirstOrDefault(s => s != null && s.ID == LegArmorSlotName);
+            return holder.Slots?.AsValueEnumerable().FirstOrDefault(s => s != null && s.ID == LegArmorSlotName);
         }
     }
 }

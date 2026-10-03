@@ -4,22 +4,32 @@
     single source of truth for all mod metadata.
     updating ModVersion here propagates to:
       - csproj <Version> / <AssemblyVersion> / <FileVersion>
-      - generated ModInfo.cs (used by [BepInPlugin] + AbstractModMetadata)
+      - generated ModInfo.cs (used by [BepInPlugin] + IModMetadata)
       - the zip artifact filenames (via Version interpolation)
 
     forge naming rules (SPT mod docs section 2.2):
       ModForgeName: client BepInPlugin Name + Forge upload, "Username-ModName"
                     only letters/numbers/single-dash allowed
-      ModServerName: AbstractModMetadata.Name on the server, letters and numbers only
+      ModServerName: IModMetadata.Name on the server, letters and numbers only
       ModGuid: must match across client + server + Forge upload, "com.username.modname"
   -->
   <PropertyGroup>
-    <ModVersion>1.0.5</ModVersion>
-    <ModSptVersion>~4.0.13</ModSptVersion>
+    <ModVersion>2.0.0</ModVersion>
+    <ModSptVersion>~4.1.6</ModSptVersion>
     <ModGuid>com.manimal.legarmor</ModGuid>
     <ModAuthor>Manimal</ModAuthor>
     <ModForgeName>Manimal-LegArmor</ModForgeName>
     <ModServerName>LegArmor</ModServerName>
+    <ModSourceUrl>https://github.com/danauraborealis/Manimal-s-Leg-Armor</ModSourceUrl>
+  </PropertyGroup>
+
+  <!-- Override these paths with -p:SptClientRoot=... / -p:SptServerRoot=... .
+       Build against the installed runtime; never redistribute its assemblies. -->
+  <PropertyGroup>
+    <SptClientRoot Condition="'$(SptClientRoot)' == ''">D:\SPT41Dev</SptClientRoot>
+    <SptServerRoot Condition="'$(SptServerRoot)' == ''">$(SptClientRoot)\SPT_Runtime</SptServerRoot>
+    <SptManagedDirectory>$(SptClientRoot)\EscapeFromTarkov_Data\Managed</SptManagedDirectory>
+    <DeployToLocalInstall Condition="'$(DeployToLocalInstall)' == ''">false</DeployToLocalInstall>
   </PropertyGroup>
 
   <!-- propagate ModVersion into the assembly version properties so end users see
@@ -29,6 +39,7 @@
     <AssemblyVersion>$(ModVersion)</AssemblyVersion>
     <FileVersion>$(ModVersion)</FileVersion>
     <Authors>$(ModAuthor)</Authors>
+    <RepositoryUrl>$(ModSourceUrl)</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

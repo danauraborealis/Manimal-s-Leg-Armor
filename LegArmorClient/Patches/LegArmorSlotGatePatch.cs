@@ -5,10 +5,8 @@ using SPT.Reflection.Patching;
 
 namespace Manimal.LegArmor.Patches
 {
-    // direct patch on Slot.method_2 (the private examined-gate inside
-    // Slot.RemoveItem/AddItem). more targeted than InventoryController.Examined
-    // - this is the exact site that produces GClass1576 ("doesn't allow
-    // removing X when it's not examined").
+    // direct patch on Slot.Examined, the narrow examined-gate used by both
+    // Slot.CheckConditions and Slot.RemoveItemInternal in the current client.
     //
     // returns true unconditionally for slots whose ParentItem descends
     // from our leg armor holder. covers mod_legarmor slot (carrier) AND
@@ -19,7 +17,10 @@ namespace Manimal.LegArmor.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(Slot), "method_2", new[] { typeof(Item) });
+            return AccessTools.Method(
+                typeof(Slot),
+                nameof(Slot.Examined),
+                new[] { typeof(Item) });
         }
 
         private static int _logCounter;
@@ -36,7 +37,7 @@ namespace Manimal.LegArmor.Patches
 
             __result = true;
             if ((++_logCounter % 10) == 1)
-                Plugin.LogSource?.LogInfo($"[LegArmor] Slot.method_2 override: slotId={__instance.ID} item={item?.StringTemplateId} parent={slotParent?.StringTemplateId} (call #{_logCounter})");
+                Plugin.LogSource?.LogInfo($"[LegArmor] Slot.Examined override: slotId={__instance.ID} item={item?.StringTemplateId} parent={slotParent?.StringTemplateId} (call #{_logCounter})");
         }
 
         private static bool BelongsToLegArmor(Item item)

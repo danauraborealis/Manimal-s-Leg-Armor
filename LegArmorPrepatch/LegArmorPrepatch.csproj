@@ -1,31 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>LegArmorPrepatch</AssemblyName>
     <RootNamespace>Manimal.LegArmor.Prepatch</RootNamespace>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Configurations>Debug;Release</Configurations>
+    <Version>$(ModVersion)</Version>
   </PropertyGroup>
-
   <ItemGroup>
-    <Reference Include="BepInEx">
-      <HintPath>D:\SPTDev\BepInEx\core\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>D:\SPTDev\BepInEx\core\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MoreBotsPrepatch">
-      <HintPath>D:\SPTDev\BepInEx\patchers\MoreBotsPrepatch.dll</HintPath>
-    </Reference>
+    <Reference Include="BepInEx"><HintPath>$(SptClientRoot)\BepInEx\core\BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(SptClientRoot)\BepInEx\core\Mono.Cecil.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MoreBotsPrepatch"><HintPath>$(SptClientRoot)\BepInEx\patchers\MoreBotsPrepatch\MoreBotsPrepatch.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
-
-  <!-- deploys the prepatch dll into BepInEx/patchers/LegArmorPrepatch/.
-       this folder is scanned by BepInEx's preloader at game start. -->
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <MakeDir Directories="D:\SPTDev\BepInEx\patchers\LegArmorPrepatch" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\SPTDev\BepInEx\patchers\LegArmorPrepatch" />
+  <Target Name="DeployPrepatch" AfterTargets="Build" Condition="'$(DeployToLocalInstall)' == 'true'">
+    <MakeDir Directories="$(SptClientRoot)\BepInEx\patchers\LegArmorPrepatch" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SptClientRoot)\BepInEx\patchers\LegArmorPrepatch" />
   </Target>
-
 </Project>

@@ -1,21 +1,23 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using EFT;
+using EFT.Customization;
 using EFT.InventoryLogic;
+using Diz.Binding;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 using UnityEngine;
+using ZLinq;
 
 namespace Manimal.LegArmor.Patches
 {
     // postfix PlayerBody.Init to mount the leg armor visual. vanilla only
     // mounts visuals for slots in the hardcoded SlotNames array; ours isnt
-    // there so we hand-construct an EquipmentSlotClass for the holder slot.
+    // there so we hand-construct a SlotView for the holder slot.
     //
     // we do NOT add it to PlayerBody.SlotViews - vanilla raid-init code
     // iterates that dict and crashes on a synthetic-keyed entry. just hold
-    // the EquipmentSlotClass alive in our own dict.
+    // the SlotView alive in our own dict.
     //
     // mesh placement is decided by the prefab's bone bindings, not the
     // parent transform, so PACA's prefab still renders on the torso. once
@@ -34,23 +36,25 @@ namespace Manimal.LegArmor.Patches
         private const string HolderTpl = "5e9c4f1d8a2b4c3d7f0e1a8c";
         private const string HolderSlotName = "mod_legarmor";
 
-        // keeps EquipmentSlotClass instances alive (per-PlayerBody) so GC
+        // keeps SlotView instances alive (per-PlayerBody) so GC
         // doesnt collect them. stale entries get disposed at next Init.
-        private static readonly Dictionary<PlayerBody, PlayerBody.EquipmentSlotClass> _liveSlots = new();
+        private static readonly Dictionary<PlayerBody, PlayerBody.SlotView> _liveSlots = new();
 
         // per-body slot-change handler so we can unsubscribe on re-Init.
         // without it the slot accumulates a handler per Init and every
         // transition fires N times.
         private static readonly Dictionary<PlayerBody, System.Action<Item>> _slotChangeHandlers = new();
 
-        // EquipmentSlotClass.Dispose() also calls DestroyCurrentModel, which
-        // returns the GameObject to the pool - we cant call it to release
-        // the binding without losing the visual. reflect Action_0/_2 and
-        // invoke them directly.
-        private static readonly FieldInfo Action0Field =
-            AccessTools.Field(typeof(PlayerBody.EquipmentSlotClass), "Action_0");
-        private static readonly FieldInfo Action2Field =
-            AccessTools.Field(typeof(PlayerBody.EquipmentSlotClass), "Action_2");
+        // SlotView.Dispose() also calls DestroyCurrentModel, which
+        // returns the GameObject to the pool - we cant call Dispose to
+        // release the bindings without losing the visual. reflect the two
+        // bind unsubscribe fields and invoke them directly. Keep the inner
+        // subscription intact: it tracks child changes for the mounted
+        // model and is released by the normal Dispose path.
+        private static readonly FieldInfo UnsubscribeField =
+            AccessTools.Field(typeof(PlayerBody.SlotView), "_unsubscribe");
+        private static readonly FieldInfo BackpackBindUnsubscribeField =
+            AccessTools.Field(typeof(PlayerBody.SlotView), "_backpackBindUnsubscribe");
 
         protected override MethodBase GetTargetMethod()
         {
@@ -61,9 +65,9 @@ namespace Manimal.LegArmor.Patches
                 nameof(PlayerBody.Init),
                 new[]
                 {
-                    typeof(GClass2197),
+                    typeof(BodyCustomization),
                     typeof(InventoryEquipment),
-                    typeof(BindableStateClass<Item>),
+                    typeof(BindableState<Item>),
                     typeof(int),
                     typeof(EPlayerSide),
                     typeof(string),
@@ -89,7 +93,7 @@ namespace Manimal.LegArmor.Patches
         {
             if (body == null || equipment == null) return;
 
-            // dispose EquipmentSlotClasses for destroyed PlayerBodies.
+            // dispose SlotViews for destroyed PlayerBodies.
             // multiple stale bindings firing concurrently on item moves
             // caused the stash carrier to fade in/out by stalling the
             // inventory transaction. Init is outside the update window so
@@ -97,7 +101,7 @@ namespace Manimal.LegArmor.Patches
             //
             // Unity-destroyed objects == null via the overloaded operator,
             // but the dict uses ReferenceEquals - check operator explicitly.
-            var stale = _liveSlots.Keys.Where(b => b == null).ToList();
+            var stale = _liveSlots.Keys.AsValueEnumerable().Where(b => b == null).ToList();
             foreach (var b in stale)
             {
                 if (_liveSlots.TryGetValue(b, out var sc))
@@ -109,7 +113,7 @@ namespace Manimal.LegArmor.Patches
             // mirror cleanup for the handler dict so dead bodies dont
             // pile up there either. handler refs become GC-eligible once
             // the slot itself goes away.
-            var staleHandlers = _slotChangeHandlers.Keys.Where(b => b == null).ToList();
+            var staleHandlers = _slotChangeHandlers.Keys.AsValueEnumerable().Where(b => b == null).ToList();
             foreach (var b in staleHandlers) _slotChangeHandlers.Remove(b);
 
             var pocketsItem = equipment.GetSlot(EquipmentSlot.Pockets)?.ContainedItem as CompoundItem;
@@ -117,14 +121,12 @@ namespace Manimal.LegArmor.Patches
 
             // walk pockets contents - dont rely on the grid name in case
             // the holder location was repaired since this body was made.
-            Item holder = null;
-            foreach (var child in pocketsItem.GetAllItems())
-            {
-                if (child.TemplateId == HolderTpl) { holder = child; break; }
-            }
+            var holder = pocketsItem.GetAllItems()
+                .AsValueEnumerable()
+                .FirstOrDefault(child => child.TemplateId == HolderTpl);
             if (holder is not CompoundItem holderCompound) return;
 
-            var slot = holderCompound.Slots.FirstOrDefault(s => s.ID == HolderSlotName);
+            var slot = holderCompound.Slots.AsValueEnumerable().FirstOrDefault(s => s.ID == HolderSlotName);
             if (slot == null) return;
 
             // bone is mostly bookkeeping - the prefab's bone bindings
@@ -132,7 +134,7 @@ namespace Manimal.LegArmor.Patches
             var bone = body.PlayerBones?.HolsterPistol;
 
             // re-Init can fire for the same body (stash refresh after raid).
-            // dispose the prior EquipmentSlotClass so its phantom GameObject
+            // dispose the prior SlotView so its phantom GameObject
             // doesnt linger when the slot is now empty (carrier lost on
             // death). safe because we already released the binding right
             // after construction - Dispose's unbind is a no-op.
@@ -155,8 +157,8 @@ namespace Manimal.LegArmor.Patches
             //                      the armor is looted off a corpse
             //   filled -> filled : skipped via _liveSlots guard
             // binding was released at mount, so Dispose only fires
-            // method_3/method_2/DestroyCurrentModel - no transaction
-            // reentrancy from Action_0/Action_2.
+            // UnsubscribeFromInner/DestroyCurrentModel - no transaction
+            // reentrancy from the released outer bindings.
             //
             // Slot fires OnAddOrRemoveItem with the AFFECTED item on both
             // add and remove (Slot.cs RemoveItemInternal passes
@@ -193,25 +195,25 @@ namespace Manimal.LegArmor.Patches
 
         private static void MountNow(PlayerBody body, Slot slot, Transform bone)
         {
-            // ArmorVest type hint routes through EquipmentSlotClass's armor
+            // ArmorVest type hint routes through SlotView's armor
             // visual loader. constructor binds to ContainedItem and kicks
             // off the LoadingJob; the visual lands via the async load.
-            var slotClass = new PlayerBody.EquipmentSlotClass(
+            var slotClass = new PlayerBody.SlotView(
                 body, slot, bone, EquipmentSlot.ArmorVest, null, null, false);
 
             // release the binding right away - persistent binding made the
             // stash carrier fade in/out by stalling the inventory transaction
             // when the user moved items in/out of the slot.
-            ReleaseBinding(slotClass, Action0Field);
-            ReleaseBinding(slotClass, Action2Field);
+            ReleaseBinding(slotClass, UnsubscribeField);
+            ReleaseBinding(slotClass, BackpackBindUnsubscribeField);
 
             _liveSlots[body] = slotClass;
 
             Plugin.LogSource?.LogInfo("[LegArmor] mounted leg armor slot");
         }
 
-        // invoke + null so EquipmentSlotClass.Dispose doesnt re-invoke.
-        private static void ReleaseBinding(PlayerBody.EquipmentSlotClass slotClass, FieldInfo field)
+        // invoke + null so SlotView.Dispose doesnt re-invoke.
+        private static void ReleaseBinding(PlayerBody.SlotView slotClass, FieldInfo field)
         {
             if (field == null) return;
             if (field.GetValue(slotClass) is System.Action unbind)

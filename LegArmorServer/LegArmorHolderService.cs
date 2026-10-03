@@ -1,9 +1,10 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 
 namespace LegArmorMod;
 
@@ -20,7 +21,7 @@ namespace LegArmorMod;
 [Injectable(InjectionType.Singleton)]
 public class LegArmorHolderService(
     ProfileHelper profileHelper,
-    DatabaseService databaseService,
+    TemplateTable templateTable,
     ISptLogger<LegArmorHolderService> logger)
 {
     public static readonly MongoId HolderTpl = new("5e9c4f1d8a2b4c3d7f0e1a8c");
@@ -38,7 +39,7 @@ public class LegArmorHolderService(
         // misses it). covers the holder, every carrier (incl. future
         // variants), and every soft plate without hardcoding tpl lists.
         var added = 0;
-        foreach (var (tpl, tpl_) in databaseService.GetItems())
+        foreach (var (tpl, tpl_) in templateTable.Items)
         {
             var isOurs = tpl == HolderTpl
                 || tpl_.Parent == LegArmorParentClass.ToString()

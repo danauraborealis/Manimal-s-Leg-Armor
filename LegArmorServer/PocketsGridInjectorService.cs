@@ -1,8 +1,8 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 
 namespace LegArmorMod;
 
@@ -16,7 +16,7 @@ namespace LegArmorMod;
 // never mounts on those screens.
 [Injectable(InjectionType.Singleton)]
 public class PocketsGridInjectorService(
-    DatabaseService databaseService,
+    TemplateTable templateTable,
     ISptLogger<PocketsGridInjectorService> logger)
 {
     public const string HiddenGridName = "legarmor_holder_grid";
@@ -25,7 +25,7 @@ public class PocketsGridInjectorService(
 
     public void Inject()
     {
-        var items = databaseService.GetTables().Templates?.Items;
+        var items = templateTable.Items;
         if (items == null)
         {
             logger.Error("[LegArmor] item templates unavailable; cannot inject pockets grid");

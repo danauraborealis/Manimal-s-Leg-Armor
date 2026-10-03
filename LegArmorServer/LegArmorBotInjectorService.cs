@@ -1,8 +1,8 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Spt.Bots;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
 namespace LegArmorMod;
@@ -73,7 +73,8 @@ public class LegArmorBotInjectorService(
 
         var r = role.ToLowerInvariant();
         if (r.Contains("boss")) return c.Boss;
-        if (r.Contains("raider") || r.Contains("cultist") || r.Contains("sectant") || r.Contains("follower"))
+        if (r.Contains("raider") || r.Contains("cultist") || r.Contains("sectant") || r.Contains("follower")
+            || r is "pmcbot" or "exusec" or "rogue")
             return c.Raider;
         if (r.Contains("usec") || r.Contains("bear") || r.Contains("pmc"))
             return c.Pmc;

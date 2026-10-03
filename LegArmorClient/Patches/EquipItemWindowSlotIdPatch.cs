@@ -34,7 +34,7 @@ namespace Manimal.LegArmor.Patches
                 {
                     typeof(Slot),
                     typeof(InventoryController),
-                    typeof(ISession),
+                    typeof(IEftSession),
                     typeof(SkillManager),
                     typeof(Vector3),
                 });

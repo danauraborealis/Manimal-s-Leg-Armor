@@ -1,42 +1,40 @@
+using System.Reflection;
 using HarmonyLib;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Generators;
+using SPTarkov.Reflection.Patching;
+using SPTarkov.Server.Core.Generators.Bot;
 using SPTarkov.Server.Core.Models.Spt.Bots;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
 namespace LegArmorMod.HeavyKilla;
 
-// prefix BotGenerator.PrepareAndGenerateBot. when an incoming generation
-// targets bossKilla, roll a chance to rewrite the Role to heavyKilla so
-// the bot generates with HeavyKilla's loadout instead. inherits all of
-// Killa's spawn behaviour (zones, escort, base chance) - no need for a
-// dedicated BossLocationSpawn entry.
-//
-// wired by hand from Mod.cs because PatchAll cant inject services.
+// Prefix BotGenerator.PrepareAndGenerateBot. When an incoming generation
+// targets bossKilla, roll a chance to rewrite Role to heavyKilla so the bot
+// uses HeavyKilla's loadout while retaining Killa's spawn behaviour.
 [Injectable(InjectionType.Singleton)]
-public class HeavyKillaReplaceKillaPatch(
-    RandomUtil randomUtil,
-    ISptLogger<HeavyKillaReplaceKillaPatch> logger)
+public sealed class HeavyKillaReplaceKillaPatch : AbstractPatch
 {
-    public void Apply(Harmony harmony)
+    private static HeavyKillaReplaceKillaPatch? _instance;
+
+    private readonly RandomUtil _randomUtil;
+    private readonly ISptLogger<HeavyKillaReplaceKillaPatch> _logger;
+
+    public HeavyKillaReplaceKillaPatch(
+        RandomUtil randomUtil,
+        ISptLogger<HeavyKillaReplaceKillaPatch> logger)
+        : base(Manimal.LegArmor.ModInfo.Guid + ".heavy-killa")
     {
-        var target = AccessTools.Method(typeof(BotGenerator), nameof(BotGenerator.PrepareAndGenerateBot));
-        if (target == null)
-        {
-            logger.Error("[LegArmor] BotGenerator.PrepareAndGenerateBot not found; heavyKilla replacement disabled");
-            return;
-        }
-
-        var prefix = new HarmonyMethod(typeof(HeavyKillaReplaceKillaPatch), nameof(PrefixStatic));
-        harmony.Patch(target, prefix: prefix);
-
+        _randomUtil = randomUtil;
+        _logger = logger;
         _instance = this;
     }
 
-    private static HeavyKillaReplaceKillaPatch? _instance;
+    protected override MethodBase? GetTargetMethod() =>
+        AccessTools.Method(typeof(BotGenerator), nameof(BotGenerator.PrepareAndGenerateBot));
 
-    public static void PrefixStatic(BotGenerationDetails botGenerationDetails)
+    [PatchPrefix]
+    private static void Prefix(BotGenerationDetails botGenerationDetails)
     {
         try
         {
@@ -44,17 +42,14 @@ public class HeavyKillaReplaceKillaPatch(
             if (!botGenerationDetails.Role.Equals(HeavyKillaConstants.VanillaKillaRole, System.StringComparison.OrdinalIgnoreCase))
                 return;
 
-            if (!_instance.randomUtil.GetChance100(HeavyKillaConstants.ReplaceKillaChance)) return;
+            if (!_instance._randomUtil.GetChance100(HeavyKillaConstants.ReplaceKillaChance)) return;
 
             botGenerationDetails.Role = HeavyKillaConstants.BotTypeName;
-            _instance.logger.Debug($"[LegArmor] swapped bossKilla -> heavyKilla (chance {HeavyKillaConstants.ReplaceKillaChance}%)");
+            _instance._logger.Debug($"[LegArmor] swapped bossKilla -> heavyKilla (chance {HeavyKillaConstants.ReplaceKillaChance}%)");
         }
         catch (System.Exception ex)
         {
-            _instance?.logger.Error($"[LegArmor] heavyKilla replace prefix failed: {ex}");
+            _instance?._logger.Error($"[LegArmor] heavyKilla replace prefix failed: {ex}");
         }
     }
-
-    private RandomUtil randomUtil { get; } = randomUtil;
-    private ISptLogger<HeavyKillaReplaceKillaPatch> logger { get; } = logger;
 }

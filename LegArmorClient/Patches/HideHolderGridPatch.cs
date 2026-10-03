@@ -1,4 +1,5 @@
 using System.Reflection;
+using EFT.InventoryLogic;
 using EFT.UI;
 using EFT.UI.DragAndDrop;
 using HarmonyLib;
@@ -23,10 +24,10 @@ namespace Manimal.LegArmor.Patches
                 new[]
                 {
                     typeof(EFT.InventoryLogic.CompoundItem),
-                    typeof(ItemContextAbstractClass),
+                    typeof(ItemContext),
                     typeof(GridView[]),
                     typeof(SlotView[]),
-                    typeof(TraderControllerClass),
+                    typeof(EFT.InventoryLogic.ItemController),
                     typeof(FilterPanel),
                     typeof(ItemUiContext),
                     typeof(bool),

@@ -1,57 +1,49 @@
+using System.Reflection;
 using HarmonyLib;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Generators;
+using SPTarkov.Reflection.Patching;
+using SPTarkov.Server.Core.Generators.Bot;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Spt.Bots;
-using SPTarkov.Server.Core.Models.Utils;
 
 namespace LegArmorMod.Patches;
 
-// postfix BotGenerator.GenerateBot - this fires for both regular wave bots
-// (PrepareAndGenerateBot -> GenerateBot) AND player scavs (PlayerScavGenerator
-// calls GenerateBot directly, skipping PrepareAndGenerateBot). hooking the
-// inner method catches all paths.
-//
-// wired by hand from Mod.cs because PatchAll cant inject the service.
+// Postfix BotGenerator.GenerateBot. This fires for both regular wave bots
+// (PrepareAndGenerateBot -> GenerateBot) and player scavs, whose generator
+// calls GenerateBot directly.
 [Injectable(InjectionType.Singleton)]
-public class BotGenerateHolderInjectPatch(
-    LegArmorBotInjectorService injector,
-    ISptLogger<BotGenerateHolderInjectPatch> logger)
+public sealed class BotGenerateHolderInjectPatch : AbstractPatch
 {
-    public void Apply(Harmony harmony)
+    private static BotGenerateHolderInjectPatch? _instance;
+
+    private readonly LegArmorBotInjectorService _injector;
+    private readonly ISptLogger<BotGenerateHolderInjectPatch> _logger;
+
+    public BotGenerateHolderInjectPatch(
+        LegArmorBotInjectorService injector,
+        ISptLogger<BotGenerateHolderInjectPatch> logger)
+        : base(Manimal.LegArmor.ModInfo.Guid + ".bot-generation")
     {
-        var target = AccessTools.Method(typeof(BotGenerator), "GenerateBot");
-        if (target == null)
-        {
-            logger.Error("[LegArmor] BotGenerator.GenerateBot not found; bots will not get leg armor");
-            return;
-        }
-
-        var postfix = new HarmonyMethod(typeof(BotGenerateHolderInjectPatch), nameof(PostfixStatic));
-        harmony.Patch(target, postfix: postfix);
-
+        _injector = injector;
+        _logger = logger;
         _instance = this;
     }
 
-    private static BotGenerateHolderInjectPatch? _instance;
+    protected override MethodBase? GetTargetMethod() =>
+        AccessTools.Method(typeof(BotGenerator), "GenerateBot");
 
-    // GenerateBot returns the same BotBase instance it received, but the
-    // method signature has the bot as a parameter named `bot` (not __result).
-    // both __result and the `bot` parameter point to the same object so
-    // either works; we use __result for clarity.
-    public static void PostfixStatic(BotGenerationDetails botGenerationDetails, BotBase __result)
+    [PatchPostfix]
+    private static void Postfix(BotGenerationDetails botGenerationDetails, BotBase __result)
     {
         try
         {
             if (_instance == null || __result == null) return;
-            _instance.injector.InjectIntoBot(__result, botGenerationDetails?.Role);
+            _instance._injector.InjectIntoBot(__result, botGenerationDetails?.Role);
         }
         catch (System.Exception ex)
         {
-            _instance?.logger.Error($"[LegArmor] bot leg armor inject failed: {ex}");
+            _instance?._logger.Error($"[LegArmor] bot leg armor inject failed: {ex}");
         }
     }
-
-    private LegArmorBotInjectorService injector { get; } = injector;
-    private ISptLogger<BotGenerateHolderInjectPatch> logger { get; } = logger;
 }

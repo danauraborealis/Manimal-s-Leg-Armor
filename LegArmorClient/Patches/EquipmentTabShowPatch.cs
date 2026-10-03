@@ -1,12 +1,13 @@
-using System.Linq;
 using System.Reflection;
 using EFT;
 using EFT.InventoryLogic;
 using EFT.UI;
 using EFT.UI.DragAndDrop;
+using EFT.UI.Insurance;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 using UnityEngine;
+using ZLinq;
 
 namespace Manimal.LegArmor.Patches
 {
@@ -57,11 +58,11 @@ namespace Manimal.LegArmor.Patches
         [PatchPostfix]
         private static void Postfix(
             EquipmentTab __instance,
-            ItemContextAbstractClass equipmentContext,
+            ItemContext equipmentContext,
             InventoryEquipment equipment,
             InventoryController inventoryController,
             SkillManager skills,
-            InsuranceCompanyClass insurance,
+            InsuranceCompany insurance,
             bool inRaid)
         {
             try
@@ -76,10 +77,10 @@ namespace Manimal.LegArmor.Patches
 
         private static void Attach(
             EquipmentTab tab,
-            ItemContextAbstractClass equipmentContext,
+            ItemContext equipmentContext,
             InventoryController inventoryController,
             SkillManager skills,
-            InsuranceCompanyClass insurance,
+            InsuranceCompany insurance,
             bool inRaid,
             InventoryEquipment equipment)
         {
@@ -91,14 +92,12 @@ namespace Manimal.LegArmor.Patches
             var pocketsItem = equipment.GetSlot(EquipmentSlot.Pockets)?.ContainedItem as CompoundItem;
             if (pocketsItem == null) return;
 
-            Item holder = null;
-            foreach (var child in pocketsItem.GetAllItems())
-            {
-                if (child.TemplateId == HolderTpl) { holder = child; break; }
-            }
+            var holder = pocketsItem.GetAllItems()
+                .AsValueEnumerable()
+                .FirstOrDefault(child => child.TemplateId == HolderTpl);
             if (holder is not CompoundItem compound) return;
 
-            var slot = compound.Slots.FirstOrDefault(s => s.ID == "mod_legarmor");
+            var slot = compound.Slots.AsValueEnumerable().FirstOrDefault(s => s.ID == "mod_legarmor");
             if (slot == null)
             {
                 Plugin.LogSource?.LogError("[LegArmor] holder has no mod_legarmor slot; check the holder JSON");
@@ -226,10 +225,10 @@ namespace Manimal.LegArmor.Patches
             SlotView anchorTemplate,
             float legArmorY,
             Slot slot,
-            ItemContextAbstractClass equipmentContext,
+            ItemContext equipmentContext,
             InventoryController inventoryController,
             SkillManager skills,
-            InsuranceCompanyClass insurance,
+            InsuranceCompany insurance,
             bool inRaid)
         {
             // reuse must look in the SAME parent we instantiate into - the

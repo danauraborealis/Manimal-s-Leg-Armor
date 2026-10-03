@@ -1,5 +1,10 @@
 <Project>
 
+  <Target Name="ValidateInstalledReferences" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'%(Reference.HintPath)' != '' and !Exists('%(Reference.HintPath)')"
+           Text="Missing target-runtime reference: %(Reference.HintPath). Set SptClientRoot and SptServerRoot to an SPT 4.1.6 installation." />
+  </Target>
+
   <!--
     generate Generated/ModInfo.cs from the mod metadata properties in Directory.Build.props.
     runs before each compile so the consts always match the props. the file is written into
@@ -22,6 +27,7 @@
       <ModInfoLine Include="        public const string ServerName = &quot;$(ModServerName)&quot;%3B" />
       <ModInfoLine Include="        public const string Version = &quot;$(ModVersion)&quot;%3B" />
       <ModInfoLine Include="        public const string SptVersion = &quot;$(ModSptVersion)&quot;%3B" />
+      <ModInfoLine Include="        public const string SourceUrl = &quot;$(ModSourceUrl)&quot;%3B" />
       <ModInfoLine Include="    }" />
       <ModInfoLine Include="}" />
     </ItemGroup>

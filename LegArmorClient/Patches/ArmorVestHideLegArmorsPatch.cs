@@ -1,20 +1,21 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using EFT.InventoryLogic;
 using EFT.UI;
 using HarmonyLib;
 using SPT.Reflection.Patching;
+using ZLinq;
 
 namespace Manimal.LegArmor.Patches
 {
-    // EquipItemWindow.method_4 returns the items shown in the popup list.
+    // EquipItemWindow.GetAvailableItems returns the items shown in the popup
+    // list.
     // for the body armor slot the list pulls in our leg armors (via the
     // soft-armor parent chain) and renders them greyed out. ArmorVestReject
     // already blocks them from being equipped; this patch keeps them out
     // of the list entirely.
     //
-    // method_4 also fires while EquipItemWindowSlotIdPatch has temporarily
+    // GetAvailableItems also fires while EquipItemWindowSlotIdPatch has temporarily
     // renamed our holder slot to "ArmorVest" - the parent-tpl guard makes
     // sure we only filter the real body armor slot.
     public class ArmorVestHideLegArmorsPatch : ModulePatch
@@ -24,11 +25,11 @@ namespace Manimal.LegArmor.Patches
         private const string HolderTpl = "5e9c4f1d8a2b4c3d7f0e1a8c";
 
         private static readonly FieldInfo Slot0Field =
-            AccessTools.Field(typeof(EquipItemWindow), "slot_0");
+            AccessTools.Field(typeof(EquipItemWindow), "_slot");
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(EquipItemWindow), "method_4");
+            return AccessTools.Method(typeof(EquipItemWindow), nameof(EquipItemWindow.GetAvailableItems));
         }
 
         [PatchPostfix]
@@ -39,7 +40,7 @@ namespace Manimal.LegArmor.Patches
             if (slot.ID != ArmorVestSlotId) return;
             if (slot.ParentItem?.TemplateId == HolderTpl) return;
 
-            __result = __result.Where(item => !IsLegArmor(item)).ToList();
+            __result = __result.AsValueEnumerable().Where(item => !IsLegArmor(item)).ToList();
         }
 
         private static bool IsLegArmor(Item item)

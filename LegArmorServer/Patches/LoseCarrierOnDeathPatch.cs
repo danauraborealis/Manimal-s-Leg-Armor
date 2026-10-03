@@ -1,47 +1,46 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using HarmonyLib;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Reflection.Patching;
+using SPTarkov.Server.Core.Helpers.InRaid;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 
 namespace LegArmorMod.Patches;
 
-// GetInventoryItemsLostOnDeath only adds items parented under equipment
-// or QuestRaidItems plus items in pocket1..4 grids. our carrier lives in
-// the holder slot, so it falls through and survives even though
-// IsItemKeptAfterDeath returns false for it.
-//
-// postfix appends every item whose tpl has the LegArmor parent. plates
-// cascade via InventoryHelper.RemoveItem.
-//
-// wired by hand because the patch needs DatabaseService - InRaidHelper's
-// primary-constructor field isnt reachable via Harmony ___field syntax.
+// GetInventoryItemsLostOnDeath only includes equipment-root, quest-raid, and
+// pocket1..4 children. The carrier is in the holder slot, so append custom
+// carrier items explicitly; their plate children cascade through vanilla
+// inventory removal.
 [Injectable(InjectionType.Singleton)]
-public class LoseCarrierOnDeathPatch(
-    DatabaseService databaseService,
-    ISptLogger<LoseCarrierOnDeathPatch> logger)
+public sealed class LoseCarrierOnDeathPatch : AbstractPatch
 {
     private static readonly MongoId LegArmorParent = new("5e9c4f1d8a2b4c3d7f0e1c00");
     private static LoseCarrierOnDeathPatch? _instance;
 
-    public void Apply(Harmony harmony)
-    {
-        var target = AccessTools.Method(typeof(InRaidHelper), "GetInventoryItemsLostOnDeath");
-        if (target == null)
-        {
-            logger.Error("[LegArmor] InRaidHelper.GetInventoryItemsLostOnDeath not found; carrier wont be lost on death");
-            return;
-        }
+    private readonly TemplateTable _templateTable;
+    private readonly ISptLogger<LoseCarrierOnDeathPatch> _logger;
 
-        var postfix = new HarmonyMethod(typeof(LoseCarrierOnDeathPatch), nameof(PostfixStatic));
-        harmony.Patch(target, postfix: postfix);
+    public LoseCarrierOnDeathPatch(
+        TemplateTable templateTable,
+        ISptLogger<LoseCarrierOnDeathPatch> logger)
+        : base(Manimal.LegArmor.ModInfo.Guid + ".lose-carrier")
+    {
+        _templateTable = templateTable;
+        _logger = logger;
         _instance = this;
     }
 
-    public static void PostfixStatic(PmcData pmcProfile, ref IEnumerable<Item> __result)
+    protected override MethodBase? GetTargetMethod() =>
+        AccessTools.Method(typeof(InRaidHelper), "GetInventoryItemsLostOnDeath");
+
+    [PatchPostfix]
+    private static void Postfix(PmcData pmcProfile, ref IEnumerable<Item> __result)
     {
         try
         {
@@ -49,10 +48,8 @@ public class LoseCarrierOnDeathPatch(
             var items = pmcProfile?.Inventory?.Items;
             if (items == null) return;
 
-            var dbItems = _instance.databaseService.GetTables().Templates?.Items;
-            if (dbItems == null) return;
-
-            var existing = __result.ToList();
+            var dbItems = _instance._templateTable.Items;
+            var existing = __result?.ToList() ?? new List<Item>();
             var existingIds = new HashSet<string>(existing.Select(i => i.Id.ToString()));
             var parentString = LegArmorParent.ToString();
 
@@ -67,10 +64,7 @@ public class LoseCarrierOnDeathPatch(
         }
         catch (System.Exception ex)
         {
-            _instance?.logger.Error($"[LegArmor] LoseCarrierOnDeath postfix failed: {ex}");
+            _instance?._logger.Error($"[LegArmor] LoseCarrierOnDeath postfix failed: {ex}");
         }
     }
-
-    private DatabaseService databaseService { get; } = databaseService;
-    private ISptLogger<LoseCarrierOnDeathPatch> logger { get; } = logger;
 }

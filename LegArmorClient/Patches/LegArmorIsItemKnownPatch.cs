@@ -1,4 +1,5 @@
 using System.Reflection;
+using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SPT.Reflection.Patching;
@@ -17,7 +18,7 @@ namespace Manimal.LegArmor.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(PlayerSearchControllerClass), nameof(PlayerSearchControllerClass.IsItemKnown), new[] { typeof(Item), typeof(ItemAddress) });
+            return AccessTools.Method(typeof(ActiveSearchController), nameof(ActiveSearchController.IsItemKnown), new[] { typeof(Item), typeof(ItemAddress) });
         }
 
         [PatchPostfix]

@@ -1,10 +1,12 @@
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using MoreBotsServer;
 using MoreBotsServer.Services;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common;
-using SPTarkov.Server.Core.Models.Utils;
 
 namespace LegArmorMod.HeavyKilla;
 
@@ -15,7 +17,7 @@ namespace LegArmorMod.HeavyKilla;
 //
 // also attaches the bot to the existing killaTagilla faction so it
 // inherits Killa's enemy relations without standing up a new faction.
-[Injectable(InjectionType = InjectionType.Singleton, TypePriority = MoreBotsLoadOrder.LoadBots)]
+[Injectable(InjectionType = InjectionType.Singleton, TypePriority = MoreBotsLoadOrder.LoadBots + 1)]
 public sealed class HeavyKillaServer(
     MoreBotsAPI moreBotsApi,
     MoreBotsCustomBotTypeService customBotTypeService,
@@ -23,8 +25,9 @@ public sealed class HeavyKillaServer(
     ISptLogger<HeavyKillaServer> logger
 ) : IOnLoad
 {
-    public async Task OnLoad()
+    public async Task OnLoadAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var assembly = Assembly.GetExecutingAssembly();
 
         // load sharedTypes + sharedConfig for the bot. second arg is the
@@ -32,6 +35,7 @@ public sealed class HeavyKillaServer(
         // (we ship one type per file).
         await moreBotsApi.LoadBotsShared(assembly, HeavyKillaConstants.BotTypeName,
             [HeavyKillaConstants.BotTypeName]);
+        cancellationToken.ThrowIfCancellationRequested();
 
         customBotTypeService.AddCustomWildSpawnTypeNames(new Dictionary<int, string>
         {
@@ -46,7 +50,6 @@ public sealed class HeavyKillaServer(
 
         logger.Info($"[LegArmor] registered heavyKilla bot (wildSpawnType={HeavyKillaConstants.WildSpawnTypeValue})");
 
-        await Task.CompletedTask;
     }
 
     private void AttachToKillaFaction()

@@ -11,8 +11,8 @@ namespace Manimal.LegArmor.Patches
     // armor system.
     //
     // gate path:
-    //   ItemView.UpdateRemoveError -> InteractionsHandlerClass.Remove
-    //     -> InteractionsHandlerClass.CanModifyItem
+    //   ItemView.UpdateRemoveError -> ItemManipulator.Remove
+    //     -> ItemManipulator.CanModifyItem
     //     -> controller.SearchController.GetObserverItemState(item, from)
     //     -> if Unknown, returns GClass1566 (UnknownItemManipulation)
     //
@@ -27,7 +27,7 @@ namespace Manimal.LegArmor.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(InteractionsHandlerClass), nameof(InteractionsHandlerClass.CanModifyItem));
+            return AccessTools.Method(typeof(ItemManipulator), nameof(ItemManipulator.CanModifyItem));
         }
 
         private static int _logCounter;

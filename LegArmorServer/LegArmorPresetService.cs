@@ -1,9 +1,9 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 
 namespace LegArmorMod;
 
@@ -13,7 +13,7 @@ namespace LegArmorMod;
 // stable MongoIds so server reloads overwrite rather than duplicate.
 [Injectable(InjectionType.Singleton)]
 public class LegArmorPresetService(
-    DatabaseService databaseService,
+    GlobalTable globalTable,
     ISptLogger<LegArmorPresetService> logger)
 {
     private static readonly PresetSpec[] Presets =
@@ -95,7 +95,7 @@ public class LegArmorPresetService(
 
     public void Register()
     {
-        var presets = databaseService.GetTables().Globals?.ItemPresets;
+        var presets = globalTable.ItemPresets;
         if (presets == null)
         {
             logger.Error("[LegArmor] Globals.ItemPresets unavailable; presets not registered");

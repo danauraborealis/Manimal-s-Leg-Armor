@@ -9,7 +9,7 @@ namespace Manimal.LegArmor.Patches
     // from our leg armor holder.
     //
     // when the user drags the carrier out of the holder's mod_legarmor
-    // slot on a corpse, Slot.method_2 looks up the BOT's InventoryController
+    // slot on a corpse, Slot.Examined looks up the BOT's InventoryController
     // (the holder's owner) and calls .Examined(item). bots' controllers
     // have Examined=false and the bot's profile doesnt know our tpls, so
     // the check returns false and the remove fails with GClass1576
