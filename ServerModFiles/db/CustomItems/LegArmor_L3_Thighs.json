@@ -2,7 +2,7 @@
     "5e9c4f1d8a2b4c3d7f0e2a02": {
         "itemTplToClone": "5648a7494bdc2d9d488b4583",
         "parentId": "5e9c4f1d8a2b4c3d7f0e1c00",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "5b5f701386f774093f2ecf0f",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
