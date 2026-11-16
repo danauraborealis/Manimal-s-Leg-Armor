@@ -2,7 +2,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b01": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -53,7 +53,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b02": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -104,7 +104,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b03": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -155,7 +155,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b04": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -206,7 +206,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b05": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -257,7 +257,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b06": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -308,7 +308,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b07": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -359,7 +359,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b08": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -410,7 +410,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b09": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -461,7 +461,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b0a": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -512,7 +512,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b0b": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
@@ -563,7 +563,7 @@
     "5e9c4f1d8a2b4c3d7f0e2b0c": {
         "itemTplToClone": "65703d866584602f7d057a8a",
         "parentId": "65649eb40bf0ed77b8044453",
-        "handbookParentId": "5b5f6fa186f77409407a7eb7",
+        "handbookParentId": "6564b96a189fe36f356d177c",
         "overrideProperties": {
             "ExaminedByDefault": true,
             "QuestItem": false,
