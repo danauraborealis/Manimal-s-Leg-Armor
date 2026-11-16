@@ -1,39 +1,52 @@
 using System.Collections.Generic;
 using System.Reflection;
+using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 
 namespace Manimal.LegArmor.Patches
 {
-    // GetPutOnArmorsNonAlloc is the single funnel EFT uses to collect worn
-    // ArmorComponents for damage / explosion / hit-zone resolution. one
-    // postfix gets our leg armor into all of those pipelines.
-    //
-    // reads from LegArmorState.HolderSlot which EquipmentTabShowPatch
-    // populates on inventory open. if the player is hit before that
-    // (eg during loading) the slot is null and we no-op - acceptable.
     public class InventoryArmorAggregatePatch : ModulePatch
     {
+        private const string HolderSlotName = "mod_legarmor";
+        private static readonly List<ArmorComponent> Own = new List<ArmorComponent>();
+        private static int _logCounter;
+
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(Inventory), nameof(Inventory.GetPutOnArmorsNonAlloc));
         }
 
-        // throttle the log; this is hot during damage events.
-        private static int _logCounter;
-
         [PatchPostfix]
-        private static void Postfix(List<ArmorComponent> armorComponents)
+        private static void Postfix(Inventory __instance, List<ArmorComponent> armorComponents)
         {
-            var slot = LegArmorState.HolderSlot;
-            var contained = slot?.ContainedItem;
-            if (contained == null) return;
+            var equipment = __instance?.Equipment;
+            if (equipment == null || armorComponents == null) return;
 
-            // walk children too to pick up plates inside the carrier.
-            var before = armorComponents.Count;
-            contained.GetItemComponentsInChildrenNonAlloc(armorComponents, true);
-            var added = armorComponents.Count - before;
+            var pockets = equipment.GetSlot(EquipmentSlot.Pockets)?.ContainedItem as CompoundItem;
+            if (pockets == null) return;
+
+            Own.Clear();
+            foreach (var child in pockets.GetAllItems())
+            {
+                var holder = child as CompoundItem;
+                if (holder == null || holder.StringTemplateId != Plugin.HolderTpl) continue;
+                foreach (var slot in holder.Slots)
+                {
+                    if (slot.ID != HolderSlotName || slot.ContainedItem == null) continue;
+                    slot.ContainedItem.GetItemComponentsInChildrenNonAlloc(Own, true);
+                }
+            }
+
+            var added = 0;
+            foreach (var component in Own)
+            {
+                if (armorComponents.Contains(component)) continue;
+                armorComponents.Add(component);
+                added++;
+            }
+            Own.Clear();
 
             if (added > 0 && (++_logCounter % 30) == 1)
             {
