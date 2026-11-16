@@ -14,7 +14,7 @@
       ModGuid: must match across client + server + Forge upload, "com.username.modname"
   -->
   <PropertyGroup>
-    <ModVersion>2.0.0</ModVersion>
+    <ModVersion>2.0.1</ModVersion>
     <ModSptVersion>~4.1.6</ModSptVersion>
     <ModGuid>com.manimal.legarmor</ModGuid>
     <ModAuthor>Manimal</ModAuthor>
@@ -40,6 +40,8 @@
     <FileVersion>$(ModVersion)</FileVersion>
     <Authors>$(ModAuthor)</Authors>
     <RepositoryUrl>$(ModSourceUrl)</RepositoryUrl>
+    <!-- keeps the local checkout path out of shipped dlls -->
+    <PathMap>$(MSBuildThisFileDirectory)=/_/</PathMap>
   </PropertyGroup>
 
 </Project>
